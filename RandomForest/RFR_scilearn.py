@@ -31,15 +31,11 @@ def RFR_etimators(num_of_trees):
 
 
 
-
-
-
-
 # train the model with different number of trees and evalueate effectiveness
 eval_data1 = [[],[]]
 
 with concurrent.futures.ProcessPoolExecutor() as executor:
-    results = executor.map(RFR_etimators, range(20,500,10))
+    results = executor.map(RFR_etimators, range(20,1000,10))
 
 
     for p1 in results:
