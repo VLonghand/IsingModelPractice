@@ -9,9 +9,9 @@ using DataFrames
 # The previous file will be removed
 # Make a copy to retain data
 #-----------------------------------
-if "rand_flat.csv" in readdir("Data")
-    rm("Data/rand_flat.csv")
-end
+    # if "$N/rand_flat$n/x$n.csv" in readdir("Data")
+    #     rm("Data/$N/rand_flat$n/x$n.csv")
+    # end
 # add names
 
 # g = [i*j for i = 1, j=1:1:n*n]
@@ -39,7 +39,7 @@ function saveAfter()
         local flat = rand(-1:2:1, (1, n*n))
         push!(df, flat)
     end
-    df |> CSV.write("Data/rand_flat.csv")
+    df |> CSV.write("Data/$N rand_flat $n x $n.csv")
     df = nothing
 end
 

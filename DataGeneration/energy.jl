@@ -1,12 +1,21 @@
 # takes a csv of flat Ising Model examples 
 # returns a csv with a column of corresponding energies for every example
-include("config.jl")
 using CSV
 using DataFrames
 
 # add simpler way to switch between different data files 
-df_exmpls = CSV.read("Data/rand_flat.csv", DataFrame)
+#--------IMPORTANT--------------------------------------------------
+#-Only change the FileName------------------------------------------
+FileName = "10000 rand_flat 8 x 8.csv"
+#-------------------------------------------------------------------
+
+
+# Get Data
+df_exmpls = CSV.read("Data/$FileName", DataFrame)
 exmpls = convert(Matrix, df_exmpls[:,:])
+
+n = convert(Int,sqrt(size(df_exmpls)[2]))
+N = convert(Int,size(df_exmpls)[1])
 
 # flat to nxn
 lst_grids = []
@@ -38,4 +47,4 @@ end
 
 # export with original data
 insertcols!(df_exmpls, 1, :energies => energies)
-df_exmpls |> CSV.write("Data/Energies_with_flat_exampels.csv")
+df_exmpls |> CSV.write("Data/Energy w $FileName")
