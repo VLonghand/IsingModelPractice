@@ -1,11 +1,10 @@
 # generate N grids with random distribution of -1,1 spins 
 # save a to a CSV file as flat vectors 
 
-include("config.jl")
 using CSV
 using DataFrames
 
-N = 10000
+N = 30000
 n = 4
 
 #----------IMPORTANT----------------
