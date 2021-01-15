@@ -10,6 +10,7 @@ n = 4
 N = 10000
 
 # get and order data-----------------------------------------
+
 dataset = pd.read_csv("Data/Energies_with_flat_exampels.csv")
 
 energies = dataset['energies']

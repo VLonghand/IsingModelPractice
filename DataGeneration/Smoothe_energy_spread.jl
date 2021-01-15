@@ -1,11 +1,13 @@
 using CSV
 using DataFrames
-# using plotting
-n = 4
-N = 65536
 
-df_energies = CSV.read("Data/All4x4_Energies_with_flat_exampels.csv", DataFrame)
+# Get Data----------------------------------------------------------
+FileName = "Energy w 10000 rand_flat 8 x 8.csv"
+df_energies = CSV.read("Data/$FileName", DataFrame)
 
+n = convert(Int,sqrt(size(df_energies)[2]-1))
+N = convert(Int,size(df_energies)[1])
+#-------------------------------------------------------------------
 
 
 # via map function
@@ -41,8 +43,6 @@ while looking_for["32"] + looking_for["-32"] > 0
     map(row_checker_expoter, eachrow(df_energies_even_spread))
 end
 
-print(looking_for)
 
-print(num_of_exmaples_per*(n*n-2))
-
-df_energies_even_spread |> CSV.write("Data/Energies_even_spread_$num_of_exmaples_per.csv")
+# save file
+df_energies_even_spread |> CSV.write("Data/$FileName even spread $num_of_exmaples_per.csv")

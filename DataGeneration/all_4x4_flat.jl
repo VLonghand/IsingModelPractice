@@ -1,8 +1,10 @@
 # generates all possible 4x4 exmaple and exports as a CSV
 using CSV
 using DataFrames
+
 v = ones(1,16)
 n = 4
+
 arr = DataFrame(ones(1,16))
 
     # while size(arr)[1] < 655#36

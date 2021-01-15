@@ -5,6 +5,9 @@ include("config.jl")
 using CSV
 using DataFrames
 
+N = 10000
+n = 4
+
 #----------IMPORTANT----------------
 # The previous file will be removed
 # Make a copy to retain data
