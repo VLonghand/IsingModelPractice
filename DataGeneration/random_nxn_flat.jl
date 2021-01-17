@@ -1,11 +1,13 @@
-# generate N grids with random distribution of -1,1 spins 
-# save a to a CSV file as flat vectors 
+# generate N grids with random distribution of -1,1 spins
+# save a to a CSV file as flat vectors
 
 using CSV
 using DataFrames
 
 N = 30000
 n = 4
+
+
 
 #----------IMPORTANT----------------
 # The previous file will be removed
@@ -25,7 +27,7 @@ n = 4
 # f |> CSV.write("Data/rand_flat.csv", append = true)
 
 
-# appending vectors to a CSV; check it's more efficient to save a list of vectors instead 
+# appending vectors to a CSV; check it's more efficient to save a list of vectors instead
 function saveSlow()
     for i in 1:N
         local flat = rand(-1:2:1, (1, n*n))
@@ -35,7 +37,7 @@ function saveSlow()
 end
 
 # This is much faster
-function saveAfter()
+function saveAfter(N, n)
     local df = DataFrame(rand(-1:2:1, (1, n*n)))
     for i in 1:(N-1)
         local flat = rand(-1:2:1, (1, n*n))
@@ -44,5 +46,3 @@ function saveAfter()
     df |> CSV.write("Data/$N rand_flat $n x $n.csv")
     df = nothing
 end
-
-saveAfter()
