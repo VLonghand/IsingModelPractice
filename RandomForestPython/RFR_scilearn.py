@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import concurrent.futures
-
+plt.style.use('dark_background')
 
 # shared variables
 n = 4
@@ -11,7 +11,7 @@ N = 10000
 
 # get and order data-----------------------------------------
 
-dataset = pd.read_csv("Data/Energies_with_flat_exampels.csv")
+dataset = pd.read_csv("Data/Energy w 15000 rand_flat 4 x 4.csv")
 
 energies = dataset['energies']
 examples = dataset.iloc[:,1:n*n]
