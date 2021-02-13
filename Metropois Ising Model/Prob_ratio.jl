@@ -1,5 +1,7 @@
 include("Energy.jl")
 
-on = ones(1,16)
+β = 1/T
 
-H(on)
+function w(T, σ_trial, σ_0)
+    return exp(-β*(H(σ_trial) - H(σ_0)))
+end
