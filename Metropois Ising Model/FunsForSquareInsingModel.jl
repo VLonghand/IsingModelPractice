@@ -1,4 +1,6 @@
+module FunsForSquareInsingModel
 
+export H, M, w
 
 # Function to calculate Hamiltonian of an Ising Model state
 # Input: a flatened 4x4 grid
@@ -37,4 +39,6 @@ end
 function w(T, σ_trial, σ_0)
     β = 1/T
     return exp(-β*(H(σ_trial) - H(σ_0)))
+end
+
 end
