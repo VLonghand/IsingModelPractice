@@ -1,7 +1,9 @@
-@everywhere using Plots, Statistics
+
 #include("FunsForSquareInsingModel.jl")
 using Distributed
+@everywhere using Plots, Statistics, CSV, DataFrames
 
+# Funtions to be moved to a module to use @everywhere --------------
 @everywhere function H(spin_grid)
     acc = 0
     n = 4
@@ -30,17 +32,23 @@ end
     β = 1/T
     return exp(-β*(H(σ_trial) - H(σ_0)))
 end
+#-------------------------------------------------------------------
 
-@everywhere σ_00 = [-1 1 -1 1
-        1 -1 1 -1
-        -1 1 -1 1
-        1 -1 1 -1]
-@everywhere  σ_trial = similar(σ_00)
 
-@everywhere Ms = []
-@everywhere Ts = []
-@everywhere Mmeans = []
+# global varaible declaration -------------------------------------- 
+begin
+    @everywhere σ_00 = [-1 1 -1 1
+            1 -1 1 -1
+            -1 1 -1 1
+            1 -1 1 -1]
+    @everywhere σ_trial = similar(σ_00)
+    @everywhere Ms = []
+    @everywhere Ts = []
+    @everywhere dfMmeans = DataFrame() #16 is the number of cores x2 for T & M
+end
+#-------------------------------------------------------------------
 
+# main functions of the algorithm ----------------------------------
 @everywhere function algotithm(T)
     for i in 1:1_000_000
         push!(Ms, sum(σ_00))
@@ -57,6 +65,7 @@ end
 end
 
 @everywhere function itter_over_Temps()
+    local Mmeans = []
     for T in 0:0.01:3
         algotithm(T)
     
@@ -64,20 +73,32 @@ end
         push!(Ts, T)
         global Ms = []
     end
-
+    return Mmeans # saves as collumns
 end
+#-------------------------------------------------------------------
 
-addprocs(7)
-print(nprocs())
-print(nworkers())
+# multiprocessing troubleshooting tools ----------------------------
+#  using Distributed
+# addprocs(16)
+# print(nprocs())
+# print(nworkers())
+#-------------------------------------------------------------------
 
 for i in workers()
+    #print(i)
     r = remotecall_fetch(itter_over_Temps, WorkerPool(workers()))
+    j = Symbol(i-2)
+    setproperty!(dfMmeans, j, r)
 end
+
+dfMmeans |> CSV.write("Metropois Ising Model/Phase Transition Data/Mmeans.csv")
+#^^^^^^^^ to add more data run csv.write("file", append=true) or concat
 
 # itter_over_Temps()
 
-plot(Ts, Mmeans, label=M)
-xlabel!("Temperature")
-ylabel!("Magnetization")
-title!("Magnetization vs Temperature")
+# PLots, but you knew that already ---------------------------------
+# plot(Ts, Mmeans, label=M)
+# xlabel!("Temperature")
+# ylabel!("Magnetization")
+# title!("Magnetization vs Temperature")  
+#-------------------------------------------------------------------
