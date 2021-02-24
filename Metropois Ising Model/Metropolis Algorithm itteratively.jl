@@ -50,8 +50,8 @@ end
 #-------------------------------------------------------------------
 
 # main functions of the algorithm ----------------------------------
-@everywhere function algotithm(T,σ_00, σ_trial )
-    @inbounds for i in 1:1_000
+@everywhere function algotithm(T,σ_00, σ_trial, Ms )
+    @inbounds for i in 1:1_000_000
         push!(Ms, sum(σ_00))
 
         σ_trial = copy(σ_00)
@@ -60,7 +60,7 @@ end
         r = rand()
 
         if r <= w(T, σ_trial, σ_00) 
-            global σ_00 = σ_trial
+            σ_00 = σ_trial
         end    
     end
 end
@@ -73,12 +73,13 @@ end
                    1 -1 1 -1]
     local σ_trial = similar(σ_00)
     local Ts = []
+    local Ms =[]
 
     for T in 0:0.01:5
-        algotithm(T, σ_00, σ_trial)
+        algotithm(T, σ_00, σ_trial, Ms)
         push!(Mmeans, abs(mean(Ms)/16)) # /16 to 'normalize' or average magnetization over all spins
         push!(Ts, T)
-        global Ms = []
+        Ms = []
     end
 
     return Mmeans # saves as collumns
@@ -86,24 +87,27 @@ end
 #-------------------------------------------------------------------
 
 # multiprocessing troubleshooting tools ----------------------------
-# using Distributed
-# addprocs(16)
+using Distributed
+# addprocs(7) # one runs from init, (cores not processsors)
 # print(nprocs())
 # print(nworkers())
 #-------------------------------------------------------------------
 
 function itter_via_workers()
     for i in workers()
-        #print(i)
+        print(i)
         r = remotecall_fetch(itter_over_Temps, WorkerPool(workers()))
         j = Symbol(i-2)
-        dfMmeans.j = r
+        setproperty!(dfMmeans, j, r) #using dfMeans.j uses j as symb, not a var
     end
 end
 
 itter_via_workers()
 
-dfMmeans |> CSV.write("Metropois Ising Model/Phase Transition Data/Mmeans.csv")
+function write_to_file()
+    dfMmeans |> CSV.write("Metropois Ising Model/Phase Transition Data/Mmeans.csv")
+end
+write_to_file()
 #^^^^^^^^ to add more data run csv.write("file", append=true) or concat
 
 # itter_over_Temps()
