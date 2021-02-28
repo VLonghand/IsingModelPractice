@@ -45,7 +45,12 @@ begin
     # @everywhere Ms = []
     # @everywhere Ts = []
     # Mmeans = []
-    @everywhere dfMmeans = DataFrame()
+    @everywhere k = ones(1,501)
+    # for i in 1:501
+    #     k[i] = i
+    # end  
+    @everywhere dfMmeans = DataFrame(k)
+    delete!(dfMmeans,1)
 end
 #-------------------------------------------------------------------
 
@@ -75,42 +80,40 @@ end
     local Ts = []
     local Ms =[]
 
-    for T in 0:0.01:5
+   @inbounds for T in 0:0.01:5
         algotithm(T, σ_00, σ_trial, Ms)
         push!(Mmeans, abs(mean(Ms)/16)) # /16 to 'normalize' or average magnetization over all spins
         push!(Ts, T)
         Ms = []
     end
 
-    return Mmeans # saves as collumns
+    return Mmeans # saves as rows
 end
 #-------------------------------------------------------------------
 
 # multiprocessing troubleshooting tools ----------------------------
 using Distributed
 # addprocs(7) # one runs from init, (cores not processsors)
-# print(nprocs())
-# print(nworkers())
+print(nprocs())
+print(nworkers())
 #-------------------------------------------------------------------
 
 function itter_via_workers()
     for i in workers()
-        print(i)
         r = remotecall_fetch(itter_over_Temps, WorkerPool(workers()))
         j = Symbol(i-2)
-        setproperty!(dfMmeans, j, r) #using dfMeans.j uses j as symb, not a var
+        push!(dfMmeans, r) #using dfMeans.j uses j as symb, not a var
     end
 end
 
-itter_via_workers()
 
 function write_to_file()
-    dfMmeans |> CSV.write("Metropois Ising Model/Phase Transition Data/Mmeans.csv")
+    itter_via_workers()
+    dfMmeans |> CSV.write("Metropois Ising Model/Phase Transition Data/Mmeans.csv",
+                           append=true)
 end
-write_to_file()
-#^^^^^^^^ to add more data run csv.write("file", append=true) or concat
 
-# itter_over_Temps()
+write_to_file()
 
 # PLots, but you knew that already ---------------------------------
 # plot(Ts, Mmeans, label=M)
