@@ -26,12 +26,11 @@ function H(spin_grid)
     return acc
 end
 
+
 # Calculate magentization of an Ising state
 function M(spin_grid)
     return sum(spin_grid)
 end
-
-
 
 
 # π(σ_trial)/π(σ_0)
