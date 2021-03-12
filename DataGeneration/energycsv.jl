@@ -55,6 +55,7 @@ function import_energy_export_w_grids(Dir, Name)
     # export with original data
     insertcols!(df_exmpls, 1, :energies => energies)
     Int8.(df_exmpls) |> CSV.write("$Dir/Energy w $Name")
+    DataFrame("energies" => energies) |> CSV.write("$Dir/Energy.csv")
     energies=nothing
     df_exmpls=nothing
 end

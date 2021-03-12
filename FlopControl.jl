@@ -4,8 +4,8 @@ include("DataGeneration/random_nxn_flat.jl")
 saveAfter(90000, 7)
 
 
-include("DataGeneration/energy.jl")
-import_energy_export_w_grids("Data", "90000 rand_flat 7 x 7.csv")
+include("DataGeneration/energycsv.jl")
+import_energy_export_w_grids("Data", "All_4x4_flat.csv")
 
 # doesn't work yer
 # include("DataGeneration/Smoothe_energy_spread.jl")
