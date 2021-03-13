@@ -2,4 +2,7 @@
 *.jld
 *.bson
 *.h5
+*.pt
+*.pth
+
 
