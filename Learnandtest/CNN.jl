@@ -11,10 +11,14 @@ function get_data()
     RealtivePath = "Data/Energy w All_4x4_flat.csv"
     df_energies = CSV.read("$RealtivePath", DataFrame)
 
+    
+
     # n = convert(Int,sqrt(size(df_energies)[2]-1))
     # N = convert(Int,size(df_energies)[1])
 
-    y, X = Float32(unpack(df_energies, ==(:energies), !=(:energies)))
+    y, X = unpack(df_energies, ==(:energies), !=(:energies))
+    y = Float32.(y)
+
 
     labels = [-32, -24, -20, -16, -12, -8, -4, 0,4,8,12,16,20,24,32]
 
@@ -32,9 +36,9 @@ end
 loss(ŷ, y) = logitcrossentropy(ŷ, y)
 
 model =  Chain(
-    Conv((2,1),1=>1,pad=(1,1),relu),
+    Conv((2,2),1=>1,pad=(1,1),relu),
     Flux.flatten,
-    Dense(30,64,relu),
+    Dense(25,64,relu),
     Dense(64, 15)
     )
 
@@ -59,14 +63,24 @@ end
 
 
 error1 = []
+ŷs = []
+ys = []
 for (x,y) in test_loader
     x, y = x |> cpu, y |> cpu 
     ŷ = model(x)
+    push!(ŷs, onecold(ŷ |> cpu))
+    push!(ys, onecold(y |> cpu))
     err = onecold(y |> cpu) - onecold(ŷ |> cpu)
     append!(error1, err)
 end
 
+print(model(ones(4,4,1,1)))
+
 using Plots
-histogram(abs.(error1), bins=30, bar_width=0.4)
-sum(error1)/size(error1)[1]
-size(error1)[1]
+histogram(abs.(error1), bins=15, bar_width=0.4)
+print(sum(error1)/size(error1)[1])
+
+Plots.pyplot()
+Plots.PyPlotBackend()
+scatter!(ys,ŷs) 
+plot(p1)
