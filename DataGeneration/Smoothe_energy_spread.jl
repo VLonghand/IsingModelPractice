@@ -2,13 +2,15 @@ using CSV
 using DataFrames
 
 
-function smoothe_energy(Dir, Name, num_of_examples)
+function smoothe_energy(num_of_examples_per)
 
     # Get Data----------------------------------------------------------
-    df_energies = CSV.read("$Dir/$Name", DataFrame)
+    df_energies = CSV.read("Data/Energy w All_4x4_flat.csv", DataFrame)
 
-    n = convert(Int,sqrt(size(df_energies)[2]-1))
-    N = convert(Int,size(df_energies)[1])
+    # n = Int(sqrt(size(df_energies)[2]-1))
+    # N = convert(Int,size(df_energies)[1])
+    n = 4
+    N = 65536
     #-------------------------------------------------------------------
 
 
@@ -20,7 +22,7 @@ function smoothe_energy(Dir, Name, num_of_examples)
     # make looking_for dict
     looking_for = Dict()
     for i in -(n*n*2):2:(n*n*2)
-        looking_for["$i"] = num_of_examples #first entry "-32" => 12
+        looking_for["$i"] = num_of_examples_per #first entry "-32" => 12
     end
 
     df_energies_even_spread = DataFrame()
@@ -45,5 +47,7 @@ function smoothe_energy(Dir, Name, num_of_examples)
     end
     df_energies_even_spread_tosave = Int8.(df_energies_even_spread)
     # save file
-    df_energies_even_spread_tosave |> CSV.write("$Dir/even spread $num_of_exmaples_per $FileName.csv")
+    df_energies_even_spread_tosave |> CSV.write("Data/Energies w $(num_of_examples_per*15) even spread.csv")
 end
+
+smoothe_energy(1070) #yields 16000+
