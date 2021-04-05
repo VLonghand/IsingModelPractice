@@ -16,7 +16,7 @@ Dense(16,32,relu),
 
 Trained of ~16000 randomly sellected exaples
 for 20 epochs on the same set
-![](NN_avg_error.png)
+![](NN_train_dat_hist.png)
 
 #### Results
 
@@ -25,11 +25,10 @@ Tested on all available data
 ![](NN_yvspredy.png)
 
 ![](NN_error_hist.png)
-The tail to the left can be explained by random training data distribution, propably because 32 was included as an example and -32 wasn't
+
 
 ![](NN_avg_error.png)
-The same explanation follows for avg error
-
+The greater error at 32 is explained by 32 not being included into the training set due to random selection
 
 Noteworthy peculiarity 
 when running
@@ -45,7 +44,22 @@ cpu runns very fast i.e.
 This doesn't happen when running a CNN even though the code is virtually the same
 ![](regular_cpu.png)
 
-##CNN
+
+
+
+# CNN
+
+```julia
+    Conv((2,2),1=>5,relu),
+    Conv((2,2), 5=>3,pad=(1,1), relu),
+    Conv((2,2), 3=>3,pad=(1,1), relu),
+    Conv((2,2), 3=>5,relu),
+    Conv((2,2), 5=>3,pad=(1,1), relu),
+    Conv((2,2), 3=>3,pad=(1,1), relu),
+    Conv((2,2), 3=>5,relu),
+    Flux.flatten,
+    Dense(125, 1),
+```
 
 Trained on Flat energy distribution distribution of data
 
@@ -53,7 +67,12 @@ Trained on Flat energy distribution distribution of data
 
 the results are much worse
 
-!
+![](CNN_yvspredy.png)
+
+There is clearly less error on the boundareis where there were a lot of examples 32 and -32
+
+![](CNN_avg_error.png)
+
 
 
 Finally, NN on random vs NN on random vs CNN on random vs CNN on flat
