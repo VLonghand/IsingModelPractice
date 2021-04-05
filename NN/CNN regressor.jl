@@ -69,8 +69,10 @@ function load_testing_data()
     return X_all, y_all
 end
 
+trained_model = trains()
+
 function model_analysis()
-    trained_model = trains()
+    # trained_model = trains()
     X,y = load_testing_data()
 
     Es = [-32, -24, -20, -16, -12, -8, -4, 0, 4, 8, 12, 16, 20, 24, 32]
@@ -86,7 +88,7 @@ function model_analysis()
         push!(ys, y[i])
         push!(ŷs, ŷ)
     end
-    avg_error_per_E = [sum(error_per_E[i])/size(error_per_E[i])[end] for i in Es]
+    avg_error_per_E = [sum(abs.(error_per_E[i]))/size(error_per_E[i])[end] for i in Es]
 
     return Es, errormines, avg_error_per_E, ys, ŷs
 
@@ -94,9 +96,11 @@ function model_analysis()
 end
 Es, errormines, avg_error_per_E, ys, ŷs = model_analysis()
 
-avxg_error = bar(Es, avg_error_per_E, bins=15, legend=false, title="Avg Error per Energy", xlabel="Energy", ylabel="Average error")
+avg_error = bar(Es, avg_error_per_E, bins=15, legend=false, title="Avg |Error| per Energy", xlabel="Energy", ylabel="Average error")
 savefig(avg_error, "Mardowns/CNN_avg_error.png")
-error_hist = histogram(errormines)
+error_hist = histogram(errormines, title="Histogram of errors", legend=false)
 savefig(error_hist, "Mardowns/CNN_error_hist.png")
-yvspredy = plot(ys, ŷs, seriestype=:scatter, xlims=(-32,32),ylims=(-32,32),legend=false)
+yvspredy = plot(ys, ŷs, seriestype=:scatter,
+title="Known energies vs predicted energies", xlabel="Known E", ylabel="Predicted E",
+ xlims=(-32,32),ylims=(-32,32),legend=false)
 savefig(yvspredy, "Mardowns/CNN_yvspredy.png")

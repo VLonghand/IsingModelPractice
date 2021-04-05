@@ -14,4 +14,4 @@ import_energy_export_w_grids("Data", "All_4x4_flat.csv")
 
 
 include("Plots_and_funcs/Histograms.jl")
-histog_csv("Data/Energy w 90000 rand_flat 7 x 7.csv","energies", 64)
+histog("Data/Energy w 30000 rand_flat 4 x 4.csv","energies", 64)

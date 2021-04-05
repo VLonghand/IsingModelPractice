@@ -18,20 +18,20 @@ function build_model()
     return Chain(
     Dense(16,32,relu),
     Dense(32, 64, relu),
-    Dense(64, 150),
-    Dense(150,30),
+    Dense(64, 150,relu),
+    Dense(150,30, relu),
     Dense(30, 1),
     )
 end
-
-
-
+y_train=[y[i] for i in train]
+train_dat_hist = histogram(y_train, bins=17, bar_width=4, title="Histogram of training energies")
+savefig(train_dat_hist, "Mardowns/NN_train_dat_hist.png")
 
 function trains()
     model = build_model() |> gpu
     ps = Flux.params(model)
     data = [(X[i,:],y[i]) for i in train ]
-    model(ones(1,16))
+    model(ones(16,1))
 
     opt = ADAM(0.001) #learning rate
     loss(x,y) = Flux.mse(model(x), y)
@@ -58,7 +58,7 @@ function model_analysis()
         push!(ys, y[i])
         push!(ŷs, ŷ)
     end
-    avg_error_per_E = [sum(error_per_E[i])/size(error_per_E[i])[end] for i in Es]
+    avg_error_per_E = [sum(abs.(error_per_E[i]))/size(error_per_E[i])[end] for i in Es]
 
     return Es, errormines, avg_error_per_E, ys, ŷs
 
@@ -67,9 +67,9 @@ end
 
 Es, errormines, avg_error_per_E, ys, ŷs = model_analysis()
 
-avg_error = bar(Es, avg_error_per_E, bins=15, legend=false, title="Avg Error per Energy", xlabel="Energy", ylabel="Average error")
+avg_error = bar(Es, avg_error_per_E, bins=15, legend=false, title="Avg |Error| per Energy", xlabel="Energy", ylabel="Average error")
 savefig(avg_error, "Mardowns/NN_avg_error.png")
-error_hist = histogram(errormines, title="Error Histogram")
+error_hist = histogram(errormines, title="Error Histogram", legend=false)
 savefig(error_hist, "Mardowns/NN_error_hist.png")
 yvspredy = plot(ys, ŷs, seriestype=:scatter, title="Known vs Predicted",
  xlabel="Known energies", ylabel="Predicted energies", xlims=(-32,32),ylims=(-32,32),legend=false)
