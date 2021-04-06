@@ -16,19 +16,19 @@ Dense(16,32,relu),
 
 Trained of ~16000 randomly sellected exaples
 for 20 epochs on the same set
-![](NN_train_dat_hist.png)
+![](NN-rand_train_dat_hist.png)
 
 #### Results
 
 Tested on all available data
 
-![](NN_yvspredy.png)
+![](NN-rand_yvspredy.png)
 
-![](NN_error_hist.png)
+![](NN-rand_error_hist.png)
 
 
-![](NN_avg_error.png)
-The greater error at 32 is explained by 32 not being included into the training set due to random selection
+![](NN-rand_avg_error.png)
+The lopsided error at extrema is explained by 32 or -32 not being included into the training set due to random selection
 
 Noteworthy peculiarity 
 when running
@@ -42,7 +42,8 @@ cpu runns very fast i.e.
 ![](speedy_cpu.png)
 
 This doesn't happen when running a CNN even though the code is virtually the same
-![](regular_cpu.png)
+![](regular_cpu.png)<br/>
+
 
 
 
@@ -61,17 +62,27 @@ This doesn't happen when running a CNN even though the code is virtually the sam
     Dense(125, 1),
 ```
 
-Trained on Flat energy distribution distribution of data
+### Trained on **Flat** energy distribution distribution of data
 
-![](CNN_train_dat_hits.png)
+for 20 epochs
+
+![](CNN-flat_train_dat_hits.png)
+
+When evaluated over all data
 
 the results are much worse
 
-![](CNN_yvspredy.png)
+![](CNN-flat_yvspredy.png)
 
 There is clearly less error on the boundareis where there were a lot of examples 32 and -32
 
-![](CNN_avg_error.png)
+![](CNN-flat_avg_error.png)
+&nbsp;
+
+&nbsp;
+
+### Then repeated over **Random** data distribution 
+
 
 
 
