@@ -6,4 +6,5 @@
 *.pth
 *.so
 *.png
+*.PNG
 *.pdf
