@@ -16,18 +16,20 @@ Dense(16,32,relu),
 
 Trained of ~16000 randomly sellected exaples
 for 20 epochs on the same set
-![](NN-rand_train_dat_hist.png)
+![](NN_train_dat_hist.png)
 
 #### Results
 
 Tested on all available data
 
-![](NN-rand_yvspredy.png)
+![](NN_yvspredy.png)<br/>
+<br/>
 
-![](NN-rand_error_hist.png)
 
+![](NN_error_hist.png)<br/>
+<br/><br/>
 
-![](NN-rand_avg_error.png)
+![](NN_avg_error.png) <br/><br/>
 The lopsided error at extrema is explained by 32 or -32 not being included into the training set due to random selection
 
 Noteworthy peculiarity 
@@ -38,14 +40,15 @@ when running
 ```
 and gpu isn't set up
 cpu runns very fast i.e. 
+<br/><br/>
+![](speedy_cpu.png)<br/>
 
-![](speedy_cpu.png)
-
-This doesn't happen when running a CNN even though the code is virtually the same
+This doesn't happen when running a CNN<br/>
+even though the code is virtually the same<br/><br/>
 ![](regular_cpu.png)<br/>
 
 
-
+<br/><br/>
 
 
 # CNN
@@ -66,17 +69,17 @@ This doesn't happen when running a CNN even though the code is virtually the sam
 
 for 20 epochs
 
-![](CNN-flat_train_dat_hits.png)
+![](CNN-rand_train_dat_hits.png)
 
 When evaluated over all data
 
 the results are much worse
 
-![](CNN-flat_yvspredy.png)
+![](CNN-rand_yvspredy.png)
 
 There is clearly less error on the boundareis where there were a lot of examples 32 and -32
 
-![](CNN-flat_avg_error.png)
+![](CNN-rand_avg_error.png)
 &nbsp;
 
 &nbsp;
