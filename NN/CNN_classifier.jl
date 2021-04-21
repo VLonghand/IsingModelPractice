@@ -81,15 +81,21 @@ function trains()
 
     test_x, test_y = [(x,y) for (x,y) in train_loader]
     loss2(x,y) = (onehot_to_E(y)-onehot_to_E(model(x)))^2
-    evalcb() = @show((mean([loss2(x,y) for x in x_test for y in y_test])))
+    losses = [] 
+    function evalcb()
+        avg_loss = mean([loss(x,y) for x in x_test for y in y_test])
+        push!(losses, avg_loss)
+        @show(avg_loss)
+
+    end
+
     opt = ADAM(0.001) #learning rate
     
-    @epochs 200 Flux.train!(loss, ps, data, opt,
-                         cb = Flux.throttle(evalcb, 5))
-    return model
+    @epochs 200 Flux.train!(loss2, ps, data, opt, cb = Flux.throttle(evalcb,1))
+    return model, losses
 end
 
-model = trains()
+model, losses = trains()
 
 # Evaluate ---------------------------------------------------------
 
@@ -108,5 +114,24 @@ function pass_test()
     end
     return ŷs, ys, error1 
 end
+ŷs, ys, error1  = pass_test()
+# function plotandsave_results()
 
-ŷs, ys, error1 = pass_test()
+# loss per epoch
+plot( 1:200, losses, title="Loss per epoch", xlabel="epoch", ylabel="log(loss)", legend=false)
+
+#Es, errormines, avg_error_per_E, ys, ŷs = model_analysis()
+
+
+# avg_error = bar(Es, avg_error_per_E, bins=15, legend=false, title="Avg |Error| per Energy", xlabel="Energy", ylabel="Average error")
+# savefig(avg_error, "Mardowns/CNN-rand_avg_error.png")
+error_hist = histogram(error1, title="Histogram of errors", legend=false)
+# savefig(error_hist, "Mardowns/CNNv-rand_error_hist.png")
+yvspredy = plot(ys, ŷs, seriestype=:scatter,
+                title="Known energies vs predicted energies",
+                xlabel="Known E", ylabel="Predicted E",
+                xlims=(-32,32),ylims=(-32,32),legend=false)
+# savefig(yvspredy, "Mardowns/CNN-rand_yvspredy.png")
+# end
+
+# plotandsave_results()

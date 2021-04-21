@@ -12,7 +12,7 @@ function get_data()
     train, test = partition(eachindex(y), 0.25, shuffle=true)     
     return train, test, X, y
 end 
-train, test, X, y = get_data()
+train, test, X, Y = get_data()
 
 function build_model()
     return Chain(
@@ -23,23 +23,27 @@ function build_model()
     Dense(30, 1),
     )
 end
-y_train=[y[i] for i in train]
-train_dat_hist = histogram(y_train, bins=17, bar_width=4, title="Histogram of training energies")
-savefig(train_dat_hist, "Mardowns/NN_train_dat_hist.png")
+function plotandsave_training()
+    y_train=[y[i] for i in train]
+    train_dat_hist = histogram(y_train, bins=17, bar_width=4, title="Histogram of training energies")
+    savefig(train_dat_hist, "Mardowns/CNN_vs_NN_vs_data_ditrib/NN_train_dat_hist.png")
+end
+plotandsave_training()
 
 function trains()
     model = build_model() |> gpu
     ps = Flux.params(model)
-    data = [(X[i,:],y[i]) for i in train ]
+    data = [(X[i,:],Y[i]) for i in train ] |> gpu
     model(ones(16,1))
-
-    opt = ADAM(0.001) #learning rate
     loss(x,y) = Flux.mse(model(x), y)
-    @epochs 20 Flux.train!(loss, ps, data, opt )
+    cdeval() = @show sum([loss(x,y) for x in X for y in Y])
+    opt = ADAM(0.001) #learning rate
+    
+    @epochs 20 Flux.train!(loss, ps, data, opt, cb=cdeval )
     return model
 end
 
-# trained_model = trains()
+trained_model = trains()
 
 
 function model_analysis()
@@ -65,12 +69,16 @@ function model_analysis()
 
 end
 
-Es, errormines, avg_error_per_E, ys, ŷs = model_analysis()
+function plotandsave_results()
 
-avg_error = bar(Es, avg_error_per_E, bins=15, legend=false, title="Avg |Error| per Energy", xlabel="Energy", ylabel="Average error")
-savefig(avg_error, "Mardowns/NN_avg_error.png")
-error_hist = histogram(errormines, title="Error Histogram", legend=false)
-savefig(error_hist, "Mardowns/NN_error_hist.png")
-yvspredy = plot(ys, ŷs, seriestype=:scatter, title="Known vs Predicted",
- xlabel="Known energies", ylabel="Predicted energies", xlims=(-32,32),ylims=(-32,32),legend=false)
-savefig(yvspredy, "Mardowns/NN_yvspredy.png")
+    Es, errormines, avg_error_per_E, ys, ŷs = model_analysis()
+
+    avg_error = bar(Es, avg_error_per_E, bins=15, legend=false, title="Avg |Error| per Energy", xlabel="Energy", ylabel="Average error")
+    savefig(avg_error, "Mardowns/CNN_vs_NN_vs_data_ditrib/NN_avg_error.png")
+    error_hist = histogram(errormines, title="Error Histogram", legend=false)
+    savefig(error_hist, "Mardowns/CNN_vs_NN_vs_data_ditrib/NN_error_hist.png")
+    yvspredy = plot(ys, ŷs, seriestype=:scatter, title="Known vs Predicted",
+    xlabel="Known energies", ylabel="Predicted energies", xlims=(-32,32),ylims=(-32,32),legend=false)
+    savefig(yvspredy, "Mardowns/CNN_vs_NN_vs_data_ditrib/NN_yvspredy.png")
+end
+# plotandsave_results()
