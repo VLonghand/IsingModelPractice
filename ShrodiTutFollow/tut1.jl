@@ -1,4 +1,4 @@
-using   Plots
+using   Plots, LinearAlgebra, SparseArrays, UnicodePlots
 # Simple harmonic oscilator to test slover 
 
 function SHO(kx,ky,cx=0,cy=0)
@@ -9,7 +9,7 @@ function SHO(kx,ky,cx=0,cy=0)
         V = 0.5 * (kx*(x-cx)^2 + ky*(y-cy)^2)
     end
 
-    heatmap(xy,xy, SHO_V, c=:amp)
+    Plots.heatmap(xy,xy, SHO_V, c=:amp)
 end
 
 SHO(2,1,0,0)
@@ -23,6 +23,26 @@ dx = x[2]-x[1]
 dy = y[2]-y[1]
 
 # constructing second derivative matrix
+dia_len = sqrt(L^2^2*2)
+
+
+
+# (-∇²+V̂)ψ = εψ
+# T̂ = -∇²
+T̂ = Tridiagonal([-1 for i in 1:(L^2-1)],
+                [4 for i in 1:L^2],
+                [-1 for i in 1:(L^2-1)] ) 
+T̂ = convert(SparseMatrixCSC,T̂)
+for i in 0:L
+    T̂[L^2-i,L^2+i-L] = -1
+    T̂[L^2+i-L,L^2-i] = -1
+end
+# T̂ = convert(Tridiagonal, T̂)
+
+UnicodePlots.spy(T̂[L^2-L,:])
+
+# println(T̂[L^2-100,:,:,:])
+
 
 function slove(potential)
 
