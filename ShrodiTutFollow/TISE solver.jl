@@ -72,17 +72,20 @@ function second_der_oper( L, 𝑑) #assuming square grid, i.e. dx = dy = 𝑑
     return T̂
 end
 
+function potential_oper!(potential, emptyV̂::SparseMatrixCSC)
+     # V is an Array{Any,2}, I don't know why {Any}
+    # without conversion eigs spits arror about {Any}
+    emptyV̂ = convert(SparseMatrixCSC{Float32,Int64}, spdiagm(0=>potential[:]))
+    return emptyV̂
+end
 
-function solve1(potential, T̂)
-    V̂ = spdiagm(0=>potential[:])
-    # V is an Array{Any,2}, I don't know why {Any}
-    V̂ = convert(SparseMatrixCSC{Float32,Int64},V̂) # without this eigs spits arror about {Any}
 
+function solve1(V̂, T̂)   
     Ĥ = V̂ + T̂
 
     # TODO: 𝜓 is a waste of memory
-    𝜆, 𝜓 = eigs(Ĥ, nev=1, which=:SM) # nev=1 cause we don't need others
-    return 𝜆, 𝜓
+    𝜆, 𝜓 = eigs(Ĥ, nev=1, which=:SM, ritzvec=false) # nev=1 cause we don't need others
+    return 𝜆
 end
 
 
@@ -95,15 +98,18 @@ function test_solver_w_SHO()
     limit = 20
     x⚥=range(-limit, limit, length=L)      #apparently 40/256 far enough away from actual Δ to cause major error
     T̂ = second_der_oper(L, x⚥[1]-x⚥[2])
+    emptyV̂ = spzeros(L^2,L^2) #preallocation
 
     kx = rand(num)*0.16
     ky = rand(num)*0.16
     cx = (rand(num).-0.5).*16
     cy = (rand(num).-0.5).*16
 
+
     for i in 1:num
-        𝜆, 𝜓 = solve1(SHO(grid1, xy, L, kx[i],ky[i],cx = cx[i],cy = cy[i]), T̂)
-        # print(𝜆)
+        potential = SHO(grid1, xy, L, kx[i],ky[i],cx = cx[i],cy = cy[i]) 
+        𝜆 = solve1(potential_oper!(potential, emptyV̂), T̂)
+        # println(𝜆[1]) 
         numerical = round(real(𝜆[1]), digits=8)
         analytical = round(0.5 * (sqrt(kx[i]) + sqrt(ky[i])), digits=8)
         error = round(100*abs(numerical-analytical)/analytical, digits=5)
