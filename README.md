@@ -13,3 +13,5 @@ The project is completed in Python and Julia
 With Julia used primarily for computational tasks and Python for Machine Learing 
 
 There are funcitons for genrating the traing data, trainging models and graphing the result
+
+#### Include friendly files are those that won't run any code, only define function
