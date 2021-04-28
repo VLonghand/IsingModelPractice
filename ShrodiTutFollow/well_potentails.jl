@@ -1,4 +1,4 @@
-using Plots, Distributions, SparseArrays, HDF5
+using Plots, Distributions, SparseArrays, JLD2
 using StatsBase: sample
 
 ## Infinite well (IW)
@@ -19,8 +19,9 @@ function Lys_gen(Es,Lxs)
     in_sqrt = 0
     Es_new = []
     Lxs_new = []
+    len = size(Es)[end]
 
-    for i in 1:100
+    for i in 1:len
 
         in_sqrt = (2*Es[i])/(pi^2) - 1/(Lxs[i]^2)
 
@@ -95,7 +96,7 @@ function IW_potential(Lxs, Lys)
         # convert(SparseMatrixCSC{Float32,Int64}, V)
         push!(Vs,V)
     end
-    # Vs = convert(Array{Matrix, 1} , Vs)
+    # Vs = convert(Array{Array{Float32, 2}, 1} , Vs)
     return Vs
 end
 
@@ -114,32 +115,21 @@ function generate_and_save(num_Es)
     Es, Lxs, Lys  = Lys_gen(Es, Lxs)
     # "swap the values of Lx and Ly with a 50% probability to prevent one dimension from always being larger"(K. Mills, 2017) 
     Lys_Lxs_rand_swap!(Lxs,Lys)
+
     # generate potentials from Es, Lxs, Lys; cx, cy are random for each
     Vs = IW_potential(Lxs,Lys)
 
-    Es = convert(Array{Float64,1}, Es)
-
-    # open file and write to it
-    file = h5open("ShrodiTutFollow/finite_well_schrodinger.h5", "w")
-    create_dataset(file, "IWenergies", Es)
-    create_dataset(file, "IWpotentials", Vs)
-    close(file)
+    jldopen("ShrodiTutFollow/finite_well_schrodinger.jld2", "w") do file
+        file["energies"] = Es
+        file["potentials"] = Vs
+    end
+    # jldsave("ShrodiTutFollow/finite_well_schrodinger.jld2"; energies = Es, potentials = Vs)
 
 end
-generate_and_save(100)
-
- # energies in range = [0,0.4]
- Es = rand(Uniform(0,0.4), 100)
- # Lx in range = [4,15]
- Lxs = rand(Uniform(4,15), 100)
- Es, Lxs, Lys  = Lys_gen(Es, Lxs)
- # "swap the values of Lx and Ly with a 50% probability to prevent one dimension from always being larger"(K. Mills, 2017) 
- Lys_Lxs_rand_swap!(Lxs,Lys)
- # generate potentials from Es, Lxs, Lys; cx, cy are random for each
- Vs = IW_potential(Lxs,Lys)
+# generate_and_save(10000)
 
 # test if Es are right
-err = []
+# err = []
 # for i in 1:size(Lxs)[end]
 #     newE = (pi^2)/(2*Lxs[i]^2) + (pi^2)/(2*Lys[i]^2)
 #     if Es[i] != newE
