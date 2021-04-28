@@ -1,10 +1,20 @@
-*.csv
-*.jld
-*.bson
-*.h5
-*.pt
-*.pth
+
+# I don't remeber
 *.so
+
+# visuals
 *.png
 *.PNG
 *.pdf
+
+# Data storage
+*.jld
+*.jld2
+*.csv
+*.bson
+*.h5
+
+# Neural Net storage
+# pytorch
+*.pt
+*.pth
