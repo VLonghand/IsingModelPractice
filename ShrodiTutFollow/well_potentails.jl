@@ -1,4 +1,4 @@
-using Plots, Distributions, SparseArrays
+using Plots, Distributions, SparseArrays, HDF5
 using StatsBase: sample
 
 ## Infinite well (IW)
@@ -59,8 +59,21 @@ function IW_potential(Lxs, Lys)
     len = size(Lxs)[end]
     Vs = []
 
+    # takes max, min and val, if out of bounds equates to closest boundary 
+    # also converts val to int
+    function constrain_to_boun(val, max = 256, min=256)
+        if max < val
+            return max
+        elseif min > val
+            return min
+        else
+            return trunc(Int, val)
+        end
+        
+    end
+
     function make_bounds(Lx, Ly, cx, cy)
-        to_int(n) = trunc(Int, n)
+        to_int(n) = constrain_to_boun(n) # else large L cause negative indices 
         up(L,c) = 0.5*(2*c+L)
         low(L,c) = 0.5*(2*c-L)
         x_lower = to_int(low(Lx,cx))
@@ -71,6 +84,7 @@ function IW_potential(Lxs, Lys)
     end
 
     # offset the well from center of image
+    
     cxs = rand(Uniform(15,lim-15),len)
     cys = rand(Uniform(15,lim-15),len)
     # itterates to make a wells, 4 parameters per
@@ -78,8 +92,10 @@ function IW_potential(Lxs, Lys)
         V = spzeros(lim,lim)
         x_lower, x_upper, y_lower, y_upper = make_bounds(Lxs[i], Lys[i], cxs[i], cys[i])
         V[x_lower:x_upper, y_lower:y_upper] .= 20
+        # convert(SparseMatrixCSC{Float32,Int64}, V)
         push!(Vs,V)
     end
+    # Vs = convert(Array{Matrix, 1} , Vs)
     return Vs
 end
 
@@ -91,21 +107,36 @@ end
 # returns nothing; generates potential and saves potentials and energies to an h5 file
 function generate_and_save(num_Es)
     # energies in range = [0,0.4]
-    Es = rand(Uniform(0,0.4), 100)
+    Es = rand(Uniform(0,0.4), num_Es)
     # Lx in range = [4,15]
-    Lxs = rand(Uniform(4,15), 100)
+    Lxs = rand(Uniform(4,15), num_Es)
     # redefine Es, Lxs that satisfy the equation for Ly and create Lys
-    Es, Lxs, Lys  = Lys_gen!(Es, Lxs)
+    Es, Lxs, Lys  = Lys_gen(Es, Lxs)
     # "swap the values of Lx and Ly with a 50% probability to prevent one dimension from always being larger"(K. Mills, 2017) 
     Lys_Lxs_rand_swap!(Lxs,Lys)
     # generate potentials from Es, Lxs, Lys; cx, cy are random for each
     Vs = IW_potential(Lxs,Lys)
 
-    # open file and write to it
+    Es = convert(Array{Float64,1}, Es)
 
+    # open file and write to it
+    file = h5open("ShrodiTutFollow/finite_well_schrodinger.h5", "w")
+    create_dataset(file, "IWenergies", Es)
+    create_dataset(file, "IWpotentials", Vs)
+    close(file)
 
 end
+generate_and_save(100)
 
+ # energies in range = [0,0.4]
+ Es = rand(Uniform(0,0.4), 100)
+ # Lx in range = [4,15]
+ Lxs = rand(Uniform(4,15), 100)
+ Es, Lxs, Lys  = Lys_gen(Es, Lxs)
+ # "swap the values of Lx and Ly with a 50% probability to prevent one dimension from always being larger"(K. Mills, 2017) 
+ Lys_Lxs_rand_swap!(Lxs,Lys)
+ # generate potentials from Es, Lxs, Lys; cx, cy are random for each
+ Vs = IW_potential(Lxs,Lys)
 
 # test if Es are right
 err = []
