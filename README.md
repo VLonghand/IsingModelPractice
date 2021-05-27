@@ -15,3 +15,5 @@ With Julia used primarily for computational tasks and Python for Machine Learnin
 There are functions for generating the training data, training models and graphing the result
 
 #### 'Include friendly' files are those that won't run any code when you inclue them, only define function
+
+### The 99% Jupyter Notebook is a lie/bug, it's mostly Julia
